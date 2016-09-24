@@ -111,7 +111,13 @@ void BXWritePC(uint32_t addr) {
 }
 
 void BLXWritePC(uint32_t addr __attribute__ ((unused))) {
-	CORE_ERR_not_implemented("BLXWritePC\n");
+	if ((CORE_CurrentMode_read() == Mode_Handler)
+			&& ((addr & 0xf0000000) == 0xf0000000)) {
+		exception_return(addr);
+	} else {
+		SET_THUMB_BIT(addr & 0x1);
+		BranchTo(addr & 0xfffffffe);
+	}
 }
 
 void BranchTo(uint32_t addr) {

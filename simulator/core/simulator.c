@@ -44,6 +44,7 @@
 
 #include STATIC_ROM_HEADER
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // GLOBALS
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,7 @@ EXPORT unsigned dumpatpc = -3;
 EXPORT int dumpatcycle = -1;
 EXPORT int dumpallcycles = 0;
 EXPORT int returnr0 = 0;
+EXPORT char* dologfile = NULL;
 EXPORT int usetestflash = 0;
 
 
@@ -688,6 +690,20 @@ EXPORT void sim_terminate(bool should_exit) {
 	INFO("Simulator shutdown successfully.\n");
 	if (!should_exit)
 		return;
+        if (dologfile != NULL) {
+            FILE* fp = fopen(dologfile, "wb");
+            for(int i = 0; i < 16; i++)
+            {
+                uint32_t r = CORE_reg_read(i);
+                fwrite(&r, 1, 4, fp);
+            }
+            for(int addr = 0x20000000; addr < 0x20008000; addr += 4)
+            {
+                uint32_t mem = read_word(addr);
+                fwrite(&mem, 1, 4, fp);
+            }
+            fclose(fp);
+        }
 	if (returnr0) {
 		uint32_t r0 = CORE_reg_read(0);
 		DBG2("Return code is r0: %08x\n", r0);
@@ -961,4 +977,3 @@ static void join_periph_threads(void) {
 		}
 	}
 }
-

@@ -35,6 +35,8 @@ static void usage_fail(int retcode) {
 	printf("\nUSAGE: ./simulator [OPTS]\n\n");
 	printf("\
 -- DEBUGGING -------------------------------------------------------------------\n\
+\t-l, --logfile [filename]\n\
+\t\tPrints processor state to a log file once simulation is finished\n\
 \t-g, --gdb [port]\n\
 \t\tAct as a remote target for gdb to debug. The optional port\n\
 \t\targument specifies the port to listen on, otherwise a random\n\
@@ -125,16 +127,17 @@ int main(int argc, char **argv) {
 			{"flash",         required_argument, 0,              'f'},
 			{"usetestflash",  no_argument,       &usetestflash,  1},
 			{"help",          no_argument,       0,              '?'},
+                        {"logfile",     required_argument, 0,              'l'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		int c;
 
 #ifdef HAVE_DECOMPILE
-		c = getopt_long(argc, argv, "dg::c:y:apds:erm:f:?", long_options,
+		c = getopt_long(argc, argv, "dg::c:y:apds:erm:f:l:?", long_options,
 				&option_index);
 #else
-		c = getopt_long(argc, argv, "dg::c:y:aps:erm:f:?", long_options,
+		c = getopt_long(argc, argv, "dg::c:y:aps:erm:f:l:?", long_options,
 				&option_index);
 #endif
 
@@ -239,6 +242,10 @@ int main(int argc, char **argv) {
 				INFO("Simulator will use %s as flash\n",
 						flash_file);
 				break;
+
+                        case 'l':
+                                dologfile = strndup(optarg, 128);
+                                break;
 
 			case '?':
 			default:

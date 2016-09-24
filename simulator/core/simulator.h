@@ -60,6 +60,7 @@ extern int dumpatcycle;
 extern int dumpallcycles;
 extern int limitcycles;
 extern int returnr0;
+extern char* dologfile;
 extern int usetestflash;
 
 // Simulator state
